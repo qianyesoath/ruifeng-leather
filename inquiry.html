@@ -1,0 +1,125 @@
+<!DOCTYPE html>
+<html lang="zh-CN" data-lang="zh">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="robots" content="noindex,nofollow">
+  <link rel="icon" href="img/favicon.png" type="image/png">
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,500;0,700;1,400&family=Noto+Sans+SC:wght@300;400;500;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="css/site.css">
+  <script>
+    (function () {
+      try {
+        var q = new URLSearchParams(location.search).get("lang");
+        var l = (q === "en" || q === "zh") ? q : (localStorage.getItem("ruifeng-lang") || "zh");
+        document.documentElement.setAttribute("data-lang", l === "en" ? "en" : "zh");
+        document.documentElement.lang = l === "en" ? "en" : "zh-CN";
+      } catch (e) {}
+    })();
+  </script>
+  <title>询价寄样 / Inquiry · 锐枫皮业</title>
+  <meta name="description" content="锐枫皮业询价寄样。只存在这台电脑。">
+</head>
+<body data-page="inquiry">
+<div class="topbar">
+  <div class="ribbon">
+    <span class="lang-zh">图与价为占位</span>
+    <span class="lang-en">Images and prices are placeholders</span>
+  </div>
+  <nav id="navbar">
+    <a class="logo" href="index.html">RUIFENG</a>
+    <button class="nav-toggle" type="button" data-nav-toggle aria-expanded="false">
+      <span class="lang-zh">菜单</span>
+      <span class="lang-en">Menu</span>
+    </button>
+    <div class="nav-links">
+      <a href="index.html" data-nav="home"><span class="lang-zh">首页</span><span class="lang-en">Home</span></a>
+      <a href="catalog.html" data-nav="catalog"><span class="lang-zh">皮料目录</span><span class="lang-en">Catalog</span></a>
+      <a href="colors.html" data-nav="colors"><span class="lang-zh">色卡</span><span class="lang-en">Colors</span></a>
+      <a href="about.html" data-nav="about"><span class="lang-zh">给设计师</span><span class="lang-en">Designers</span></a>
+      <a href="inquiry.html" data-nav="inquiry"><span class="lang-zh">询价寄样</span><span class="lang-en">Inquiry</span></a>
+    </div>
+    <div class="lang-toggle" role="group" aria-label="Language">
+      <button type="button" data-lang-btn="zh" aria-pressed="true">ZH</button>
+      <span>|</span>
+      <button type="button" data-lang-btn="en" aria-pressed="false">EN</button>
+    </div>
+  </nav>
+</div>
+
+<main class="wrap wrap-narrow">
+  <div class="page-hero">
+    <p class="eyebrow">Inquiry</p>
+    <h1><span class="lang-zh">询价 / 寄样</span><span class="lang-en">Inquiry / swatch</span></h1>
+    <p><span class="lang-zh">填完只存在这台电脑的浏览器里（ruifeng-inquiries）。不会发到微信，也不会发邮件。</span><span class="lang-en">Saved only in this browser as ruifeng-inquiries. Nothing is sent to WeChat or email.</span></p>
+  </div>
+  <div class="note-box">
+    <span class="lang-zh">中文习惯：填完后加微信 ruifeng-demo 说一声。英文习惯：把同样内容发到 hello@ruifengleather.com。</span>
+    <span class="lang-en">Chinese habit: after saving, message WeChat ruifeng-demo. English habit: send the same note to hello@ruifengleather.com.</span>
+  </div>
+  <form class="panel" data-inquiry-form data-source="inquiry">
+    <label><span class="lang-zh">你的名字</span><span class="lang-en">Your name</span>
+      <input name="name" required autocomplete="name">
+    </label>
+    <label><span class="lang-zh">品牌 / 工作室</span><span class="lang-en">Brand / studio</span>
+      <input name="brand" autocomplete="organization">
+    </label>
+    <label><span class="lang-zh">微信（中文方便留这个）</span><span class="lang-en">WeChat (optional)</span>
+      <input name="wechat" autocomplete="off" placeholder="ruifeng-demo">
+    </label>
+    <label><span class="lang-zh">邮箱（英文方便留这个）</span><span class="lang-en">Email</span>
+      <input name="email" type="email" autocomplete="email" placeholder="hello@ruifengleather.com">
+    </label>
+    <label><span class="lang-zh">看中的皮（编号或名字）</span><span class="lang-en">Hides of interest (id or name)</span>
+      <input name="hides" placeholder="rf-tg-01">
+    </label>
+    <label><span class="lang-zh">色号（下单必填）</span><span class="lang-en">Color code (required)</span>
+      <select name="color_code" required data-color-select>
+        <option value="">—</option>
+      </select>
+    </label>
+    <p class="fineprint">
+      <span class="lang-zh">按下单色号选。名字可以改，色号不会变。可先看色卡页。</span>
+      <span class="lang-en">Order by code. Names can change; codes do not. See the color card first.</span>
+    </p>
+    <label><span class="lang-zh">用来做什么</span><span class="lang-en">What is it for</span>
+      <select name="use">
+        <option value="bags">包袋 / Bags</option>
+        <option value="shoes">鞋履 / Shoes</option>
+        <option value="small">小皮件 / Small leather</option>
+        <option value="other">其他 / Other</option>
+      </select>
+    </label>
+    <label><span class="lang-zh">大概数量（尺，示例）</span><span class="lang-en">Qty (sq ft, example)</span>
+      <input name="qty" placeholder="20">
+    </label>
+    <label class="check">
+      <input type="checkbox" name="swatch" checked>
+      <span class="lang-zh">要小样（色卡一块看看）</span>
+      <span class="lang-en">I want a swatch</span>
+    </label>
+    <label><span class="lang-zh">补充</span><span class="lang-en">Note</span>
+      <textarea name="note" rows="4"></textarea>
+    </label>
+    <p class="fineprint lang-zh">微信或邮箱留一个就行。参考价不是合同价。</p>
+    <p class="fineprint lang-en">Leave WeChat or email. Reference price is not a contract.</p>
+    <button type="submit" class="btn-ink"><span class="lang-zh">存在这台电脑</span><span class="lang-en">Save on this computer</span></button>
+  </form>
+  <h2 style="font-family:var(--font-serif);font-weight:400;letter-spacing:2px;font-size:24px;margin:40px 0 14px">
+    <span class="lang-zh">本机已存的草稿</span><span class="lang-en">Drafts on this computer</span>
+  </h2>
+  <div data-inq-list></div>
+  <p style="margin-top:16px"><button type="button" class="btn-ink" data-inq-clear><span class="lang-zh">清空本机草稿</span><span class="lang-en">Clear local drafts</span></button></p>
+</main>
+
+<footer class="site-footer">
+  <div class="footer-logo">RUIFENG LEATHER</div>
+  <p><span class="lang-zh">锐枫皮业 · 小牛皮料 · 给独立设计师</span><span class="lang-en">Ruifeng Leather · calf hides for independent designers</span></p>
+  <p><span class="lang-zh">图与价为占位 · 广东鞣厂 · 无真实门牌</span><span class="lang-en">Images and prices are placeholders · Guangdong mill · no street address</span></p>
+  <p><span class="lang-zh">微信示例 ruifeng-demo · 邮箱示例 hello@ruifengleather.com</span><span class="lang-en">WeChat example ruifeng-demo · email example hello@ruifengleather.com</span></p>
+  <p><span class="lang-zh">没有购物车、没有结账、没有付款。</span><span class="lang-en">No cart, no checkout, no payment.</span></p>
+</footer>
+<script src="js/data.js"></script>
+<script src="js/site.js"></script>
+</body>
+</html>
