@@ -1,16 +1,16 @@
 首页章节和目录卡片优先用这一层粒面图：
 
-  togo.png          Togo纹
-  swift.png         Swift纹
-  epsom.png         Epsom纹
-  clemence.png      掌纹
-  tumbled.png       摔纹
-  lychee-small.png  小纹
+  togo.jpg          Togo纹
+  swift.jpg         Swift纹
+  epsom.jpg         Epsom纹
+  clemence.jpg      掌纹
+  tumbled.jpg       摔纹
+  lychee-small.jpg  小纹
 
 可选：
-  box.png           光面盒纹（没有则用 img/atelier/box-calf.png）
-  lychee-large.png  大纹（没有则退回 lychee-small / grain-calf）
+  box.jpg           光面盒纹（没有则用 img/atelier/box-calf.jpg）
+  lychee-large.jpg  大纹（没有则退回 lychee-small / grain-calf）
 
 缺图时站点退回 img/atelier/ 再退回 img/swatches/，不会白屏。
-首页头图仍是 img/atelier/hero-hide.png。
+首页头图仍是 img/atelier/hero-hide.jpg。
 不要在图上或文件名里写对标品牌。

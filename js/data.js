@@ -13,8 +13,8 @@ window.RUIFENG = {
       en: "Togo",
       line_zh: "大卵石粒，挺，耐刮，适合包",
       line_en: "Large pebble, firm, scratch-tough — bags",
-      photo: "img/grains/togo.png",
-      photo_fallback: "img/atelier/grain-calf.png",
+      photo: "img/grains/togo.jpg",
+      photo_fallback: "img/atelier/grain-calf.jpg",
       swatch: "oxblood",
       coreColors: ["black", "gold", "etoupe", "cognac", "craie", "navy"]
     },
@@ -24,8 +24,8 @@ window.RUIFENG = {
       en: "Swift",
       line_zh: "极细软面，适合小皮件",
       line_en: "Very fine soft face — small leather",
-      photo: "img/grains/swift.png",
-      photo_fallback: "img/atelier/box-calf.png",
+      photo: "img/grains/swift.jpg",
+      photo_fallback: "img/atelier/box-calf.jpg",
       swatch: "honey",
       coreColors: ["black", "gold", "etoupe", "cognac", "craie", "navy"]
     },
@@ -35,8 +35,8 @@ window.RUIFENG = {
       en: "Epsom",
       line_zh: "规则压纹，硬挺好打理",
       line_en: "Regular press grain, firm, easy care",
-      photo: "img/grains/epsom.png",
-      photo_fallback: "img/atelier/grain-calf.png",
+      photo: "img/grains/epsom.jpg",
+      photo_fallback: "img/atelier/grain-calf.jpg",
       swatch: "black",
       coreColors: ["black", "gold", "etoupe", "cognac", "craie", "navy"]
     },
@@ -46,8 +46,8 @@ window.RUIFENG = {
       en: "Palm grain",
       line_zh: "大掌纹，松软",
       line_en: "Large palm grain, slack and soft",
-      photo: "img/grains/clemence.png",
-      photo_fallback: "img/atelier/grain-calf.png",
+      photo: "img/grains/clemence.jpg",
+      photo_fallback: "img/atelier/grain-calf.jpg",
       swatch: "chestnut",
       coreColors: ["black", "gold", "etoupe", "cognac", "craie", "navy"]
     },
@@ -57,8 +57,8 @@ window.RUIFENG = {
       en: "Tumbled",
       line_zh: "自然摔皱",
       line_en: "Natural tumbled creases",
-      photo: "img/grains/tumbled.png",
-      photo_fallback: "img/atelier/veg-calf.png",
+      photo: "img/grains/tumbled.jpg",
+      photo_fallback: "img/atelier/veg-calf.jpg",
       swatch: "olive",
       coreColors: ["black", "gold", "etoupe", "cognac", "olive", "navy"]
     },
@@ -68,8 +68,8 @@ window.RUIFENG = {
       en: "Fine pebble",
       line_zh: "细荔枝小纹",
       line_en: "Fine lychee pebble",
-      photo: "img/grains/lychee-small.png",
-      photo_fallback: "img/atelier/grain-calf.png",
+      photo: "img/grains/lychee-small.jpg",
+      photo_fallback: "img/atelier/grain-calf.jpg",
       swatch: "camel",
       coreColors: ["black", "gold", "etoupe", "cognac", "craie", "navy"]
     },
@@ -79,8 +79,8 @@ window.RUIFENG = {
       en: "Box calf",
       line_zh: "光面挺括",
       line_en: "Smooth and firm",
-      photo: "img/atelier/box-calf.png",
-      photo_fallback: "img/atelier/box-calf.png",
+      photo: "img/atelier/box-calf.jpg",
+      photo_fallback: "img/atelier/box-calf.jpg",
       swatch: "black",
       coreColors: ["black", "gold", "etoupe", "cognac", "craie", "navy"]
     },
@@ -90,8 +90,8 @@ window.RUIFENG = {
       en: "Large pebble",
       line_zh: "大荔枝纹",
       line_en: "Large lychee pebble",
-      photo: "img/grains/lychee-small.png",
-      photo_fallback: "img/atelier/grain-calf.png",
+      photo: "img/grains/lychee-small.jpg",
+      photo_fallback: "img/atelier/grain-calf.jpg",
       swatch: "wine",
       coreColors: ["black", "gold", "etoupe", "cognac", "wine", "navy"]
     }

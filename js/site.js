@@ -68,7 +68,7 @@
   }
 
   function swatchPath(colorId) {
-    return "img/swatches/" + colorId + ".png";
+    return "img/swatches/" + colorId + ".jpg";
   }
 
   function categoryOf(h) {
@@ -155,7 +155,7 @@
   function initHeroAtelier() {
     var el = qs("#heroBg");
     if (!el) return;
-    var atelier = el.getAttribute("data-atelier") || "img/atelier/hero-hide.png";
+    var atelier = el.getAttribute("data-atelier") || "img/atelier/hero-hide.jpg";
     var fallback = el.getAttribute("data-fallback") || "img/hero.jpg";
     var probe = new Image();
     probe.onload = function () {
@@ -273,7 +273,7 @@
     var grid = qs("[data-home-cats]");
     if (!grid || !window.RUIFENG) return;
     grid.innerHTML = window.RUIFENG.categories.map(function (c) {
-      var photo = c.photo || ("img/grains/" + c.id + ".png");
+      var photo = c.photo || ("img/grains/" + c.id + ".jpg");
       var fallback = categoryFallbacks(c, c.swatch);
       return (
         '<a class="chapter" href="catalog.html?type=' + c.id + '">' +
