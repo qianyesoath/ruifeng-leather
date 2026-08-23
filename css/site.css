@@ -1,6 +1,6 @@
-/* 锐枫皮业 · Grok Bot 版
-   视觉语言沿 Accio 原版：paper / ink / accent、Playfair + Noto Sans SC。
-   这一版更疏、更大、更暗的头图叠层。远程纹理已去掉，纸纹用本地 img/paper.png。 */
+/* 锐枫皮业
+   paper / ink / accent、Playfair + Noto Sans SC。
+   疏、大、暗的头图叠层。纸纹用本地 img/paper.png。 */
 
 :root {
   --color-paper: #FDFCFB;
@@ -78,6 +78,7 @@ nav {
   border-bottom: 1px solid transparent;
   transition: all 0.5s var(--transition);
   gap: 20px;
+  flex-wrap: nowrap;
 }
 
 nav.scrolled {
@@ -105,6 +106,27 @@ nav.scrolled {
   gap: 0 36px;
   margin-left: auto;
 }
+
+.card-codes {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px 10px;
+  margin-top: 8px;
+}
+.card-code {
+  font-size: 11px;
+  letter-spacing: 0.08em;
+  color: var(--color-text-dim);
+}
+.photo-note { margin-top: 8px; }
+.fair-line {
+  margin-top: 22px;
+  font-size: 12px;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  opacity: 0.88;
+}
+.hero .fair-line { animation: fadeIn 2.8s var(--transition); }
 
 .nav-links a {
   text-decoration: none;
@@ -800,6 +822,11 @@ footer, .site-footer {
   60% { transform: translateX(-50%) translateY(-5px); }
 }
 
+@media (max-width: 1100px) {
+  .nav-links { gap: 0 18px; }
+  .nav-links a { letter-spacing: 1.2px; font-size: 11px; }
+}
+
 @media (max-width: 960px) {
   .chapter-grid, .cat-grid { grid-template-columns: 1fr; gap: 40px; }
   .section-about { grid-template-columns: 1fr; padding: 96px 6%; gap: 48px; }
@@ -816,7 +843,25 @@ footer, .site-footer {
 }
 
 @media (max-width: 800px) {
-  .nav-toggle { display: inline-block; margin-left: auto; }
+  nav {
+    padding: 12px 14px;
+    gap: 10px;
+    flex-wrap: nowrap;
+  }
+  nav.scrolled { padding: 8px 14px; }
+  .logo { font-size: 14px; letter-spacing: 3px; }
+  .nav-toggle {
+    display: inline-block;
+    margin-left: 0;
+    flex-shrink: 0;
+    z-index: 1101;
+  }
+  .lang-toggle {
+    margin-left: auto;
+    flex-shrink: 0;
+    z-index: 1102;
+    position: relative;
+  }
   .nav-links {
     display: none;
     position: absolute;
@@ -826,19 +871,33 @@ footer, .site-footer {
     border-bottom: 1px solid var(--color-border);
     flex-direction: column;
     align-items: flex-start;
-    padding: 12px 20px 20px;
+    padding: 16px 20px 22px;
     margin: 0;
-    gap: 12px;
+    gap: 16px;
+    z-index: 1090;
+    box-shadow: 0 12px 24px rgba(0,0,0,0.06);
   }
   .topbar { position: sticky; }
   nav { position: relative; }
   .nav-links.is-open { display: flex; }
 }
 
+@media print {
+  .topbar, footer, .site-footer, .filters, .ribbon, .nav-toggle, .hero-actions { display: none !important; }
+  .color-code { font-size: 28px !important; }
+  .color-card { break-inside: avoid; }
+  body { background: #fff; }
+  .wrap { padding: 12px; }
+}
+
 @media (max-width: 520px) {
   .card-grid { grid-template-columns: 1fr; gap: 28px; }
   .color-wall { grid-template-columns: 1fr 1fr; gap: 16px; }
+  .color-card .color-code { font-size: 22px; }
   .footer-logo { letter-spacing: 6px; font-size: 16px; }
   .btn-ink + .btn-ink { margin-left: 0; margin-top: 10px; }
   .hero { min-height: 560px; }
+  .logo { font-size: 13px; letter-spacing: 2px; }
+  .lang-toggle { font-size: 10px; gap: 6px; }
+  .nav-toggle { padding: 6px 10px; letter-spacing: 1px; }
 }

@@ -1,0 +1,24 @@
+把 dist 里所有文件上传到服务器网站根目录（或一个子目录）。
+
+可以整包丢到 Nginx / 普通虚拟主机 / GitHub Pages。
+不要改文件名，不要改相对路径。
+
+双击 index.html 也能看。放进子目录（例如 /ruifeng-leather/）也不用改文件。
+语言切换已经按完整路径写，不会跳到域名根上变成 ?lang=zh。
+
+Nginx 试例（根目录）：
+
+    location / {
+        try_files $uri $uri/ /index.html;
+    }
+
+如果网站在子目录 /ruifeng-leather/：
+
+    location /ruifeng-leather/ {
+        try_files $uri $uri/ /ruifeng-leather/index.html;
+    }
+
+找不到的页会走 404.html，再送回首页。
+
+不要上传 _参考、_orig、tools、.git、node。
+微信和邮箱以后换成真的：改 js/data.js 顶部，以及各页页脚。

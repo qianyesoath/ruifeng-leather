@@ -1,9 +1,8 @@
-/* 锐枫皮业 · Grok Bot 版示例数据。全部占位，不是厂里库存。
+/* 锐枫皮业目录数据。图与价供展会对照，不是实时库存。
    系列按设计师常问的粒面写：Togo / Swift / Epsom / 掌纹 / 摔纹 / 小纹 / 盒纹 / 大纹。
    前台不要写对标品牌。Togo、Swift、Epsom 是粒面检索名。
    色号 RF-xxxx 固定，不复用。屏幕色仅供参考，以实物和色号为准。 */
 window.RUIFENG = {
-  demo: true,
   wechat: "ruifeng-demo",
   email: "hello@ruifengleather.com",
   categories: [
@@ -88,10 +87,13 @@ window.RUIFENG = {
       id: "lychee-large",
       zh: "大纹",
       en: "Large pebble",
-      line_zh: "大荔枝纹",
-      line_en: "Large lychee pebble",
+      line_zh: "大荔枝纹（图暂用小纹特写对照）",
+      line_en: "Large lychee pebble (fine-pebble photo for now)",
       photo: "img/grains/lychee-small.jpg",
       photo_fallback: "img/atelier/grain-calf.jpg",
+      photo_is_fallback: true,
+      photo_note_zh: "暂无独立大纹特写，图用小纹对照。9月1日展会看实样。",
+      photo_note_en: "No unique large-pebble photo yet — fine pebble shown. See the hide at the 1 Sept fair.",
       swatch: "wine",
       coreColors: ["black", "gold", "etoupe", "cognac", "wine", "navy"]
     }

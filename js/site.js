@@ -1,4 +1,4 @@
-/* 锐枫皮业 · Grok Bot 版。无网络请求。语言记在 localStorage ruifeng-lang */
+/* 锐枫皮业。无网络请求。语言记在 localStorage ruifeng-lang */
 (function () {
   "use strict";
 
@@ -28,15 +28,31 @@
     });
     rewriteLinks(l);
     try {
-      var u = new URL(location.href);
-      u.searchParams.set("lang", l);
-      history.replaceState({}, "", u.pathname.split("/").pop() + u.search + u.hash);
+      history.replaceState({}, "", langAwareLocation(l));
     } catch (e) {}
   }
 
+  function langAwareLocation(lang) {
+    var u = new URL(location.href);
+    u.searchParams.set("lang", lang);
+    var path = u.pathname || "/";
+    // Keep the full directory. Never pop the last segment:
+    // /ruifeng-leather/ would otherwise become ?lang= on the host root.
+    if (!path) path = "/";
+    return path + u.search + u.hash;
+  }
+
+  function skipLangRewrite(href) {
+    if (!href) return true;
+    var t = href.replace(/^\s+/, "");
+    if (!t || t.charAt(0) === "#") return true;
+    if (/^(mailto:|tel:|javascript:|data:)/i.test(t)) return true;
+    if (/^https?:/i.test(t)) return true;
+    return false;
+  }
+
   function withLang(href, lang) {
-    if (!href || href.charAt(0) === "#" || href.indexOf("mailto:") === 0) return href;
-    if (/^https?:/i.test(href)) return href;
+    if (skipLangRewrite(href)) return href;
     var hash = "";
     var hashAt = href.indexOf("#");
     if (hashAt >= 0) { hash = href.slice(hashAt); href = href.slice(0, hashAt); }
@@ -51,10 +67,14 @@
 
   function rewriteLinks(lang) {
     qsa("a[href]").forEach(function (a) {
-      var href = a.getAttribute("href");
-      if (!href) return;
       if (a.hasAttribute("data-keep-href")) return;
-      a.setAttribute("href", withLang(href, lang));
+      var base = a.getAttribute("data-base-href");
+      if (base == null) {
+        base = a.getAttribute("href") || "";
+        a.setAttribute("data-base-href", base);
+      }
+      if (skipLangRewrite(base)) return;
+      a.setAttribute("href", withLang(base, lang));
     });
   }
 
@@ -130,6 +150,28 @@
     });
   }
 
+  function fillGrainSelects(selected) {
+    qsa("[data-grain-select], select[name=grain]").forEach(function (sel) {
+      if (sel.tagName !== "SELECT") return;
+      var current = selected || sel.value || "";
+      var keepHidden = sel.type === "hidden";
+      if (keepHidden) return;
+      sel.innerHTML = "";
+      var blank = document.createElement("option");
+      blank.value = "";
+      blank.textContent = "—";
+      sel.appendChild(blank);
+      var cats = (window.RUIFENG && window.RUIFENG.categories) || [];
+      cats.forEach(function (c) {
+        var o = document.createElement("option");
+        o.value = c.id;
+        o.textContent = c.zh + " / " + c.en;
+        if (current && current === c.id) o.selected = true;
+        sel.appendChild(o);
+      });
+    });
+  }
+
   function imgWithFallback(src, fallback, cls) {
     var extra = cls ? ' class="' + cls + '"' : "";
     var chain = [];
@@ -184,16 +226,30 @@
 
   function hideCard(h) {
     var primary = h.colors[0];
+    var cat = categoryOf(h);
     var dots = h.colors.map(function (cid) {
       var c = window.RUIFENG.colors[cid];
       var hex = c ? c.hex : "#ccc";
-      return '<i class="card-dot" style="background:' + hex + '"></i>';
+      var code = (c && c.code) ? c.code : "";
+      return '<i class="card-dot" style="background:' + hex + '" title="' + code + '"></i>';
     }).join("");
+    var codes = h.colors.map(function (cid) {
+      var code = colorCode(cid);
+      return code ? '<span class="card-code">' + code + "</span>" : "";
+    }).join("");
+    var honest = "";
+    if (cat && cat.photo_is_fallback) {
+      honest =
+        '<p class="fineprint photo-note">' +
+          '<span class="lang-zh">' + (cat.photo_note_zh || "图为对照，展会看实样") + "</span>" +
+          '<span class="lang-en">' + (cat.photo_note_en || "Photo is a stand-in — see the hide at the fair") + "</span>" +
+        "</p>";
+    }
     return (
       '<article class="hide-card">' +
         '<a class="card-link" href="product.html?id=' + encodeURIComponent(h.id) + '">' +
           '<div class="swatch-wrap">' +
-            imgWithFallback(hidePhoto(h), categoryFallbacks(categoryOf(h), primary), "") +
+            imgWithFallback(hidePhoto(h), categoryFallbacks(cat, primary), "") +
           "</div>" +
           '<div class="card-body">' +
             '<p class="eyebrow">' +
@@ -209,6 +265,8 @@
               '<span class="lang-en">' + h.thickness_mm + " mm</span>" +
             "</p>" +
             '<p class="card-dots">' + dots + "</p>" +
+            '<p class="card-codes">' + codes + "</p>" +
+            honest +
             priceBlock(h) +
           "</div>" +
         "</a>" +
@@ -232,9 +290,25 @@
     var toggle = qs("[data-nav-toggle]");
     var links = qs(".nav-links");
     if (toggle && links) {
-      toggle.addEventListener("click", function () {
-        var open = links.classList.toggle("is-open");
+      function setOpen(open) {
+        links.classList.toggle("is-open", open);
         toggle.setAttribute("aria-expanded", open ? "true" : "false");
+        document.body.classList.toggle("nav-open", open);
+      }
+      toggle.addEventListener("click", function (ev) {
+        ev.stopPropagation();
+        setOpen(!links.classList.contains("is-open"));
+      });
+      qsa("a", links).forEach(function (a) {
+        a.addEventListener("click", function () { setOpen(false); });
+      });
+      document.addEventListener("click", function (ev) {
+        if (!links.classList.contains("is-open")) return;
+        if (links.contains(ev.target) || toggle.contains(ev.target)) return;
+        setOpen(false);
+      });
+      document.addEventListener("keydown", function (ev) {
+        if (ev.key === "Escape") setOpen(false);
       });
     }
   }
@@ -289,6 +363,12 @@
               '<span class="lang-zh">' + (c.line_zh || "") + "</span>" +
               '<span class="lang-en">' + (c.line_en || "") + "</span>" +
             "</p>" +
+            (c.photo_is_fallback
+              ? ('<p class="fineprint photo-note">' +
+                  '<span class="lang-zh">' + (c.photo_note_zh || "") + "</span>" +
+                  '<span class="lang-en">' + (c.photo_note_en || "") + "</span>" +
+                "</p>")
+              : "") +
           "</div>" +
         "</a>"
       );
@@ -360,8 +440,8 @@
       var countEl = qs("[data-result-count]");
       if (countEl) {
         countEl.innerHTML =
-          '<span class="lang-zh">共 ' + list.length + " 条示例皮料</span>" +
-          '<span class="lang-en">' + list.length + " sample hides</span>";
+          '<span class="lang-zh">共 ' + list.length + " 张皮</span>" +
+          '<span class="lang-en">' + list.length + " hides</span>";
       }
       if (!list.length) {
         mount.innerHTML =
@@ -413,7 +493,7 @@
         '<div class="prose">' +
           "<h1>" +
             '<span class="lang-zh">没有这条皮</span>' +
-            '<span class="lang-en">This hide is not in the demo</span>' +
+            '<span class="lang-en">This hide is not in the catalog</span>' +
           "</h1>" +
           "<p>" +
             '<span class="lang-zh">链接可能写错了。回目录再点一张。</span>' +
@@ -450,8 +530,8 @@
         '<div class="product-visual">' +
           imgWithFallback(hidePhoto(h), categoryFallbacks(categoryOf(h), h.colors[0]), "hero-swatch") +
           '<p class="fineprint" style="margin-top:14px">' +
-            '<span class="lang-zh">系列皮面，图是占位。</span>' +
-            '<span class="lang-en">Collection hide — image is a placeholder.</span>' +
+            '<span class="lang-zh">' + ((categoryOf(h) && categoryOf(h).photo_note_zh) || "系列皮面。屏幕图仅供对照，以实物和色号为准。") + "</span>" +
+            '<span class="lang-en">' + ((categoryOf(h) && categoryOf(h).photo_note_en) || "Collection hide. Screen photo is a guide; hide and code decide.") + "</span>" +
           "</p>" +
         "</div>" +
         '<div class="product-copy">' +
@@ -482,18 +562,18 @@
             "</tr>" +
           "</table>" +
           '<p class="fineprint">' +
-            '<span class="lang-zh">幅宽约 ' + h.width_cm + " cm · 小牛 · 认证占位 — 厂里有再补</span>" +
-            '<span class="lang-en">Width approx ' + h.width_cm + " cm · calf · certificates: add only if the mill has them</span>" +
+            '<span class="lang-zh">幅宽约 ' + h.width_cm + " cm · 小牛 · 证书有再补</span>" +
+            '<span class="lang-en">Width approx ' + h.width_cm + " cm · calf · certificates when the mill has them</span>" +
           "</p>" +
           priceBlock(h) +
           '<div class="color-row">' + chips + "</div>" +
           '<div class="cta-zh">' +
             '<div class="wechat-card">' +
               "<h2>中文这边：加微信问</h2>" +
-              "<p>这是示例微信号，不是真客服。</p>" +
-              '<p class="wechat-id">ruifeng-demo</p>' +
-              '<button type="button" class="btn-ink" data-copy="ruifeng-demo">复制微信号</button>' +
-              '<p class="fineprint" style="margin-top:14px">看中了就微信说皮的编号（' + h.id + '）和色号（例如 ' + (colorCode(h.colors[0]) || "RF-xxxx") + '）。要小样也可以先填询价表。</p>' +
+              "<p>展会现场也可以直接说色号。</p>" +
+              '<p class="wechat-id">' + ((window.RUIFENG && window.RUIFENG.wechat) || "ruifeng-demo") + "</p>" +
+              '<button type="button" class="btn-ink" data-copy="' + ((window.RUIFENG && window.RUIFENG.wechat) || "ruifeng-demo") + '">复制微信号</button>' +
+              '<p class="fineprint" style="margin-top:14px">看中了就说皮的编号（' + h.id + "）和色号（例如 " + (colorCode(h.colors[0]) || "RF-xxxx") + "）。下单按色号。</p>" +
               '<p style="margin-top:10px"><a class="text-link" href="' + inquiryHref + '">也可以先填询价表 →</a></p>' +
             "</div>" +
           "</div>" +
@@ -502,6 +582,7 @@
             '<p>Reference only. Write <a data-keep-href href="mailto:hello@ruifengleather.com">hello@ruifengleather.com</a> or send the note below. Nothing is emailed by this page — it stays on this computer.</p>' +
             '<form class="mini-form" data-inquiry-form data-source="product">' +
               '<input type="hidden" name="hides" value="' + h.id + " " + h.name_en + '">' +
+              '<input type="hidden" name="grain" value="' + h.category + '">' +
               '<label>Color code / 色号' +
                 '<select name="color_code" required data-color-select><option value="">—</option></select>' +
               "</label>" +
@@ -518,7 +599,7 @@
                 "</select>" +
               "</label>" +
               '<label>Qty (sq ft, example) <input name="qty" placeholder="e.g. 30"></label>' +
-              '<label class="check"><input type="checkbox" name="swatch" checked> I want a swatch (demo request)</label>' +
+              '<label class="check"><input type="checkbox" name="swatch" checked> I want a swatch</label>' +
               '<label>Note <textarea name="note" rows="3" placeholder="Color, thickness, deadline"></textarea></label>' +
               '<button type="submit" class="btn-ink">Save inquiry on this computer</button>' +
             "</form>" +
@@ -632,6 +713,7 @@
       wechat: wechat,
       email: email,
       hides: (fd.get("hides") || "").toString().trim(),
+      grain: (fd.get("grain") || "").toString().trim(),
       color_code: (fd.get("color_code") || "").toString().trim(),
       use: (fd.get("use") || "").toString(),
       qty: (fd.get("qty") || "").toString().trim(),
@@ -649,6 +731,15 @@
         ev.preventDefault();
         var rec = formToRecord(form);
         if (!rec.name) return;
+        if (!rec.grain) {
+          var grainBox = qs("[data-form-msg]", form) || form.appendChild(document.createElement("p"));
+          grainBox.className = "form-msg err";
+          grainBox.setAttribute("data-form-msg", "");
+          grainBox.innerHTML =
+            '<span class="lang-zh">请选粒面。</span>' +
+            '<span class="lang-en">Pick a grain family.</span>';
+          return;
+        }
         if (!rec.color_code) {
           var codeBox = qs("[data-form-msg]", form) || form.appendChild(document.createElement("p"));
           codeBox.className = "form-msg err";
@@ -700,8 +791,8 @@
         "<li>" +
           "<strong>" + escapeHtml(r.name || "—") + "</strong> · " +
           escapeHtml(r.brand || "") + "<br>" +
-          '<span class="lang-zh">色号 ' + escapeHtml(r.color_code || "—") + " · 皮料 " + escapeHtml(r.hides || "—") + " · " + (r.swatch ? "要小样" : "不要小样") + "</span>" +
-          '<span class="lang-en">Code ' + escapeHtml(r.color_code || "—") + " · hides " + escapeHtml(r.hides || "—") + " · " + (r.swatch ? "wants swatch" : "no swatch") + "</span>" +
+          '<span class="lang-zh">色号 ' + escapeHtml(r.color_code || "—") + " · 粒面 " + escapeHtml(r.grain || "—") + " · 皮料 " + escapeHtml(r.hides || "—") + " · " + (r.swatch ? "要小样" : "不要小样") + "</span>" +
+          '<span class="lang-en">Code ' + escapeHtml(r.color_code || "—") + " · grain " + escapeHtml(r.grain || "—") + " · hides " + escapeHtml(r.hides || "—") + " · " + (r.swatch ? "wants swatch" : "no swatch") + "</span>" +
           '<span class="fineprint">' + escapeHtml(r.savedAt) + " · " + escapeHtml(r.id) + "</span>" +
         "</li>"
       );
@@ -733,6 +824,13 @@
     var codeParam = new URLSearchParams(location.search).get("code") ||
                     new URLSearchParams(location.search).get("color") || "";
     fillColorSelects(codeParam);
+    var grainParam = new URLSearchParams(location.search).get("grain") ||
+                     new URLSearchParams(location.search).get("type") || "";
+    if (!grainParam && hideId && window.RUIFENG) {
+      var hh = hideById(hideId);
+      if (hh) grainParam = hh.category;
+    }
+    fillGrainSelects(grainParam);
     bindInquiryForms();
     renderInquiryList();
     var wipe = qs("[data-inq-clear]");
@@ -768,7 +866,7 @@
     initScroll();
     initReveal();
     var page = document.body.getAttribute("data-page");
-    if (page === "home") renderHome();
+    if (page === "home" || page === "prints") renderHome();
     if (page === "catalog") renderCatalog();
     if (page === "product") renderProduct();
     if (page === "colors") renderColors();
