@@ -343,37 +343,158 @@
     qsa(".reveal").forEach(function (el) { observer.observe(el); });
   }
 
+  function grainDots(c) {
+    var colors = (window.RUIFENG && window.RUIFENG.colors) || {};
+    var ids = (c.coreColors || []).slice(0, 6);
+    return ids.map(function (id) {
+      var col = colors[id];
+      var hex = (col && col.hex) ? col.hex : "#ccc";
+      var code = (col && col.code) ? col.code : "";
+      return '<i class="grain-dot" style="background:' + hex + '" title="' + code + '"></i>';
+    }).join("");
+  }
+
   function renderHome() {
     var grid = qs("[data-home-cats]");
     if (!grid || !window.RUIFENG) return;
+    if (!grid.classList.contains("grain-grid")) grid.classList.add("grain-grid");
     grid.innerHTML = window.RUIFENG.categories.map(function (c) {
       var photo = c.photo || ("img/grains/" + c.id + ".jpg");
       var fallback = categoryFallbacks(c, c.swatch);
+      var honest = "";
+      if (c.photo_is_fallback) {
+        honest =
+          '<p class="grain-note">' +
+            '<span class="lang-zh">' + (c.photo_note_zh || "图为对照，展会看实样") + "</span>" +
+            '<span class="lang-en">' + (c.photo_note_en || "Photo is a stand-in — see the hide at the fair") + "</span>" +
+          "</p>";
+      }
       return (
-        '<a class="chapter" href="catalog.html?type=' + c.id + '">' +
-          '<div class="chapter-photo">' +
+        '<a class="grain-card" href="catalog.html?type=' + encodeURIComponent(c.id) + '">' +
+          '<div class="grain-card-photo">' +
             imgWithFallback(photo, fallback, "") +
           "</div>" +
-          '<div class="chapter-cap">' +
+          '<div class="grain-card-body">' +
             "<h3>" +
               '<span class="lang-zh">' + c.zh + "</span>" +
               '<span class="lang-en">' + c.en + "</span>" +
             "</h3>" +
-            "<p>" +
+            '<p class="grain-card-line">' +
               '<span class="lang-zh">' + (c.line_zh || "") + "</span>" +
               '<span class="lang-en">' + (c.line_en || "") + "</span>" +
             "</p>" +
-            (c.photo_is_fallback
-              ? ('<p class="fineprint photo-note">' +
-                  '<span class="lang-zh">' + (c.photo_note_zh || "") + "</span>" +
-                  '<span class="lang-en">' + (c.photo_note_en || "") + "</span>" +
-                "</p>")
-              : "") +
+            '<p class="grain-dots">' + grainDots(c) + "</p>" +
+            honest +
           "</div>" +
         "</a>"
       );
     }).join("");
     rewriteLinks(getLang());
+  }
+
+  function initCarousel() {
+    var root = qs("[data-carousel]");
+    if (!root) return;
+    var track = qs("[data-carousel-track]", root);
+    var slides = qsa(".carousel-slide", root);
+    var dotsWrap = qs("[data-carousel-dots]", root);
+    if (!track || slides.length < 2) return;
+
+    var i = 0;
+    var n = slides.length;
+    var timer = null;
+    var paused = false;
+    var reduce = false;
+    try {
+      reduce = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+    } catch (e) {}
+
+    if (dotsWrap) {
+      dotsWrap.innerHTML = "";
+      slides.forEach(function (_, idx) {
+        var b = document.createElement("button");
+        b.type = "button";
+        b.className = "carousel-dot";
+        b.setAttribute("aria-label", "Slide " + (idx + 1));
+        b.innerHTML = "<i></i>";
+        b.addEventListener("click", function () { go(idx); resumeSoon(); });
+        dotsWrap.appendChild(b);
+      });
+    }
+    var dots = qsa(".carousel-dot", root);
+
+    function go(to) {
+      i = ((to % n) + n) % n;
+      track.style.transform = "translateX(-" + (i * 100) + "%)";
+      slides.forEach(function (s, k) {
+        s.classList.toggle("is-active", k === i);
+        s.setAttribute("aria-hidden", k === i ? "false" : "true");
+      });
+      dots.forEach(function (d, k) {
+        d.classList.toggle("is-on", k === i);
+        if (k === i) d.setAttribute("aria-current", "true");
+        else d.removeAttribute("aria-current");
+      });
+    }
+
+    function next() { go(i + 1); }
+    function prev() { go(i - 1); }
+
+    function stop() {
+      if (timer) { clearInterval(timer); timer = null; }
+    }
+    function start() {
+      stop();
+      if (reduce || paused) return;
+      timer = setInterval(next, 6500);
+    }
+    function resumeSoon() {
+      paused = false;
+      start();
+    }
+
+    var prevBtn = qs("[data-carousel-prev]", root);
+    var nextBtn = qs("[data-carousel-next]", root);
+    if (prevBtn) prevBtn.addEventListener("click", function () { prev(); resumeSoon(); });
+    if (nextBtn) nextBtn.addEventListener("click", function () { next(); resumeSoon(); });
+
+    var startX = 0;
+    var startY = 0;
+    var dragging = false;
+    var viewport = qs("[data-carousel-viewport]", root) || root;
+
+    viewport.addEventListener("touchstart", function (ev) {
+      if (!ev.touches || !ev.touches.length) return;
+      startX = ev.touches[0].clientX;
+      startY = ev.touches[0].clientY;
+      dragging = true;
+      paused = true;
+      stop();
+    }, { passive: true });
+
+    viewport.addEventListener("touchend", function (ev) {
+      if (!dragging || !ev.changedTouches || !ev.changedTouches.length) return;
+      dragging = false;
+      var dx = ev.changedTouches[0].clientX - startX;
+      var dy = ev.changedTouches[0].clientY - startY;
+      if (Math.abs(dx) > 40 && Math.abs(dx) > Math.abs(dy)) {
+        if (dx < 0) next(); else prev();
+      }
+      setTimeout(resumeSoon, 4000);
+    }, { passive: true });
+
+    document.addEventListener("visibilitychange", function () {
+      if (document.hidden) { paused = true; stop(); }
+      else resumeSoon();
+    });
+
+    root.addEventListener("keydown", function (ev) {
+      if (ev.key === "ArrowLeft") { ev.preventDefault(); prev(); resumeSoon(); }
+      if (ev.key === "ArrowRight") { ev.preventDefault(); next(); resumeSoon(); }
+    });
+
+    go(0);
+    start();
   }
 
   function thicknessBucket(mm) {
@@ -865,6 +986,7 @@
     initHeroAtelier();
     initScroll();
     initReveal();
+    initCarousel();
     var page = document.body.getAttribute("data-page");
     if (page === "home" || page === "prints") renderHome();
     if (page === "catalog") renderCatalog();
